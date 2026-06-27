@@ -1,12 +1,14 @@
-// BUG AT LOAD FUNCTION WHEN YOU ENTER OTHER NUMBER NOT YOUR ACCOUNT YOU STILL GET THE LOAD TO YOUR ACCOUNT EVEN IF DIFFERENT NUM
-// possible solution line 45 enclosed in 'if' equal to userPhone condition
 
-const digitalWallet = { // user wallet
-    userPhone: "",
-    balance: 0,
+const account = { // user wallet
+    name: "",
+    phone: "",
+    wallet: {
+        currency: "PHP",
+        credits: 0,
+    }
 };
 
-let transactionHistory = []; // store all completed transactioins
+let transactions = []; // store all completed transactions
 
 // Helper - Reusable phone number validation (FUNCTION)
 const isValidPhone = (phoneNum) => {
@@ -20,44 +22,49 @@ const isValidPhone = (phoneNum) => {
 // Feature (FUNCTIONS)
 const load = () => { // LOAD/TOP UP
 
+    if(account.phone === "") { // if account has no number add the number entered
     // Load Number Input
     const phoneNumInput = prompt("Enter mobile number to load (must start with 09 and should be 11 digits): ")
 
-    const cleanNumInput = phoneNumInput.trim()
+    if(phoneNumInput === null) return; // return to menu
 
-    if(phoneNumInput === null) return; // returns if cancel button is clicked
+    const cleanNum = phoneNumInput.trim()
 
-    if(!isValidPhone) { // Validate Phone Num
+    if(!isValidPhone(cleanNum)) { // Validate Phone Num
         alert("Invalid phone format! Must start with 09 and must be 11 digits");
         return;
+    }
+
+    account.phone = cleanNum; // add the number to account
+
     }
 
     // Load Amount Input
     const loadAmountInput = Number(prompt("Enter the amount to load (PHP): "))
 
-    if(loadAmountInput === null) return; // returns if cancel button is clicked
+    if(loadAmountInput === null) return; // return to menu
 
     if(isNaN(loadAmountInput) || loadAmountInput <= 0) { // Validate amount
         alert("Invalid amount! Please enter a number or a valid positive number.")
         return;
     }
 
-    digitalWallet.balance += loadAmountInput; // process load/top up
+    account.wallet.credits += loadAmountInput; // process load/top up
 
-    if(digitalWallet.userPhone === "") { // connects number to digital wallet, if there is no number registered
-        digitalWallet.userPhone = cleanNumInput;
-    }
+    const loadAmount = (Math.floor(loadAmountInput * 100) / 100).toFixed(2)
+    const credits = (Math.floor(account.wallet.credits * 100) / 100).toFixed(2)
 
-    transactionHistory.push({ // record transation history
-        type: `Loaded to ${cleanNumInput}`,
+    transactions.push({ // record transation history
+        type: `Loaded to ${account.phone}`,
         amount: loadAmountInput,
-        timestamp: new Date().toLocaleDateString()
+        timestamp: new Date().toString()
     })
+
     // toFixed(2) - adds .00 to the number
     alert
     (`
-        Successfully loaded ₱${loadAmountInput.toFixed(2)} to ${cleanNumInput}
-        Your new balance is ₱${digitalWallet.balance.toFixed(2)}
+        Successfully loaded: ₱${loadAmount} to ${account.phone}
+        Your current credits: ₱${credits}
     `)
 }
 
@@ -65,14 +72,35 @@ alert("Welcome to Multi-Service Digital Wallet & Transaction Hub!");
 
 let isSystemRunning = true;
 
+if(account.name === "") {
+
+    while(true) {
+    const addName = prompt("Please enter your Full Name: ")
+    account.name = addName
+
+    if(addName === null) { // Exit 
+        alert("Thank you for using Multi-Service Digital Wallet & Transaction Hub. Goodbye!")
+        isSystemRunning = false
+        break;
+    }
+
+    if(addName.trim() === ""){
+        alert("Name cannot be empty! Please try again.")
+        continue; // skip others and repeat while
+    }
+    break;
+    }
+}
+
 while(isSystemRunning) {
     const mainMenu = prompt // Main menu for feature selection
     (`
-        Account Balance: ₱${digitalWallet.balance}
-        Registered Phone Number: ${digitalWallet.userPhone || "Not Registered"}
+        Account Name: ${account.name || "Not Registered"}
+        Account Credits: ₱${account.wallet.credits}
+        Registered Phone Number: ${account.phone || "Not Registered"}
 
         Select an action (1, 2, 3, 4, or 5):
-        1. Load/Top up Balance
+        1. Load/Top up Credits
         2. Send Money
         3. Pay Bills
         4. View Transaction History
