@@ -21,7 +21,8 @@ const isValidPhone = (phoneNum) => {
 
 // Feature (FUNCTIONS)
 const load = () => { // LOAD/TOP UP
-
+    
+    while(true) {
     if(account.phone === "") { // if account has no number add the number entered
     // Load Number Input
     const phoneNumInput = prompt("Enter mobile number to load (must start with 09 and should be 11 digits): ")
@@ -32,21 +33,24 @@ const load = () => { // LOAD/TOP UP
 
     if(!isValidPhone(cleanNum)) { // Validate Phone Num
         alert("Invalid phone format! Must start with 09 and must be 11 digits");
-        return;
+        continue;
     }
-
+    
     account.phone = cleanNum; // add the number to account
-
+    alert(`Successfully registered ${account.phone} to your account!`)
+    break;
+    }
     }
 
     // Load Amount Input
+    while(true) {
     const loadAmountInput = Number(prompt("Enter the amount to load (PHP): "))
 
     if(loadAmountInput === null) return; // return to menu
 
     if(isNaN(loadAmountInput) || loadAmountInput <= 0) { // Validate amount
         alert("Invalid amount! Please enter a number or a valid positive number.")
-        return;
+        continue;
     }
 
     account.wallet.credits += loadAmountInput; // process load/top up
@@ -66,6 +70,8 @@ const load = () => { // LOAD/TOP UP
         Successfully loaded: ₱${loadAmount} to ${account.phone}
         Your current credits: ₱${credits}
     `)
+    break;
+    }
 }
 
 alert("Welcome to Multi-Service Digital Wallet & Transaction Hub!");
@@ -84,8 +90,8 @@ if(account.name === "") {
         break;
     }
 
-    if(addName.trim() === ""){
-        alert("Name cannot be empty! Please try again.")
+    if(addName.trim() === "" || !isNaN(addName)){
+        alert("Invalid Name, Please try again.")
         continue; // skip others and repeat while
     }
     break;
@@ -106,6 +112,10 @@ while(isSystemRunning) {
         4. View Transaction History
         5. Exit
     `);
+
+    if(!["1","2","3","4", "5"].includes(mainMenu)) {
+        alert("Invalid selection! Please enter a number from 1 to 5: ")
+    }
 
     if(mainMenu === null || mainMenu.trim() === "5") { // validation for system exit
         alert("Thank you for using Multi-Service Digital Wallet & Transaction Hub. Goodbye!")
